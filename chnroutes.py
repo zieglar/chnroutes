@@ -115,9 +115,6 @@ def generate_mac(metric):
     downfile.write('\n\nrm /tmp/pptp_oldgw\n')
     upfile.close()
     downfile.close()
-    
-    print "For pptp on mac only, please copy ip-up and ip-down to the /etc/ppp folder," \
-          "don't forget to make them executable with the chmod command."
 
 def generate_win(metric):
     results = fetch_ip_data()  
