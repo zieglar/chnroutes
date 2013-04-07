@@ -70,13 +70,21 @@ def generate_mac(metric):
     #!/bin/sh
     export PATH="/bin:/sbin:/usr/sbin:/usr/bin"
     
-    OLDGW=`netstat -nr | grep '^default' | grep -v 'ppp' | sed 's/default *\\([0-9\.]*\\) .*/\\1/'`
+    OLDGW=`netstat -nr | grep '^default' | grep -v 'ppp' | sed 's/default *\([0-9\.]*\) .*/\1/' | sed '/^$/d'`
 
     if [ ! -e /tmp/pptp_oldgw ]; then
         echo "${OLDGW}" > /tmp/pptp_oldgw
     fi
     
-    dscacheutil -flushcache
+    long=`sw_vers -productVersion`
+    short=${long:0:4}
+    if [ "$short" == "10.4" ]; then
+        lookupd -flushcache
+    elif [ "$short" == "10.5" ] || [ "$short" == "10.6" ]; then
+        dscacheutil -flushcache
+    elif [ "$short" == "10.7" ] || [ "$short" == "10.8" ]; then
+        sudo killall -HUP mDNSResponder
+    fi
     
     """)
     
@@ -187,7 +195,6 @@ def generate_android(metric):
 
 def fetch_ip_data():
     #fetch data from apnic
-    print "Fetching data from apnic.net, it might take a few minutes, please wait..."
     url=r'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
     data=urllib2.urlopen(url).read()
     
